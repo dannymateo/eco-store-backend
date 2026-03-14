@@ -1,4 +1,5 @@
 HELP.md
+PLAN_FEATURE_BRANCHES.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
