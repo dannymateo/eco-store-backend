@@ -1,12 +1,13 @@
 package com.itm.eco_store.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
-/**
- * Entidad de dominio: producto del catálogo.
- * Encapsula la regla de negocio: aplicar descuento cuando la categoría es TEMPORADA_PASADA.
- */
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class Product {
 
     private Long id;
@@ -15,83 +16,39 @@ public class Product {
     private Category category;
     private PriceInfo priceInfo;
 
-    public Product(Long id, String name, String description, Category category, PriceInfo priceInfo) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.category = category;
-        this.priceInfo = priceInfo;
-    }
-
-    /**
-     * Crea un producto nuevo (sin id) con precio inicial. Si la categoría es TEMPORADA_PASADA,
-     * aplica el descuento indicado.
-     */
     public static Product create(String name, String description, Category category,
-                                BigDecimal originalPrice, BigDecimal seasonDiscountPercent) {
-        PriceInfo info;
-        if (category != null && category.requiresSeasonDiscount() && seasonDiscountPercent != null
-                && seasonDiscountPercent.compareTo(BigDecimal.ZERO) > 0) {
-            info = PriceInfo.withDiscount(originalPrice, seasonDiscountPercent);
-        } else {
-            info = PriceInfo.withoutDiscount(originalPrice);
-        }
-        return new Product(null, name, description, category, info);
+                                 BigDecimal originalPrice) {
+        BigDecimal discountPct = category != null ? category.getDiscountPercent() : BigDecimal.ZERO;
+        PriceInfo info = discountPct.compareTo(BigDecimal.ZERO) > 0
+                ? PriceInfo.withDiscount(originalPrice, discountPct)
+                : PriceInfo.withoutDiscount(originalPrice);
+        return Product.builder()
+                .name(name)
+                .description(description)
+                .category(category)
+                .priceInfo(info)
+                .build();
     }
 
-    /**
-     * Aplica el descuento de temporada pasada al precio actual.
-     * Solo tiene efecto si la categoría es TEMPORADA_PASADA.
-     *
-     * @param discountPercent porcentaje de descuento (0-100)
-     */
-    public void applySeasonDiscount(BigDecimal discountPercent) {
-        if (category != null && category.requiresSeasonDiscount() && discountPercent != null
-                && discountPercent.compareTo(BigDecimal.ZERO) > 0) {
-            this.priceInfo = PriceInfo.withDiscount(priceInfo.getOriginalPrice(), discountPercent);
-        }
+    public Product updateWith(String name, String description, Category category,
+                              BigDecimal originalPrice) {
+        BigDecimal discountPct = category != null ? category.getDiscountPercent() : BigDecimal.ZERO;
+        PriceInfo info = discountPct.compareTo(BigDecimal.ZERO) > 0
+                ? PriceInfo.withDiscount(originalPrice, discountPct)
+                : PriceInfo.withoutDiscount(originalPrice);
+        return this.toBuilder()
+                .name(name)
+                .description(description)
+                .category(category)
+                .priceInfo(info)
+                .build();
     }
 
-    /**
-     * Actualiza datos editables (nombre, descripción, categoría, precio original).
-     * Si la categoría es TEMPORADA_PASADA, aplica el descuento indicado; si no, sin descuento.
-     */
-    public void update(String name, String description, Category category,
-                       BigDecimal originalPrice, BigDecimal seasonDiscountPercent) {
-        this.name = name;
-        this.description = description;
-        this.category = category;
-        if (category != null && category.requiresSeasonDiscount() && seasonDiscountPercent != null
-                && seasonDiscountPercent.compareTo(BigDecimal.ZERO) > 0) {
-            this.priceInfo = PriceInfo.withDiscount(originalPrice, seasonDiscountPercent);
-        } else {
-            this.priceInfo = PriceInfo.withoutDiscount(originalPrice);
-        }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public PriceInfo getPriceInfo() {
-        return priceInfo;
-    }
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public Category getCategory() { return category; }
+    public PriceInfo getPriceInfo() { return priceInfo; }
 
     @Override
     public boolean equals(Object o) {
