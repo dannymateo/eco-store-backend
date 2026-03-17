@@ -1,9 +1,13 @@
 package com.itm.eco_store.infrastructure.adapter.in.web.mapper;
 
+import java.math.BigDecimal;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import com.itm.eco_store.domain.model.Category;
+import com.itm.eco_store.domain.model.PriceInfo;
 import com.itm.eco_store.domain.model.Product;
 import com.itm.eco_store.infrastructure.adapter.in.web.dto.CreateProductDTO;
 import com.itm.eco_store.infrastructure.adapter.in.web.dto.ProductResponse;
@@ -18,18 +22,18 @@ public interface ProductMapper {
 
     /**
      * Convierte CreateProductDTO a Product para crear.
-     * El precio original se extrae del DTO.
+     * El precio original se extrae del DTO y se crea un PriceInfo sin descuento.
      * El descuento se aplicará en ProductApplicationService.
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "priceInfo.originalPrice", source = "originalPrice")
+    @Mapping(target = "priceInfo", source = "originalPrice", qualifiedByName = "toPriceInfo")
     Product toDomain(CreateProductDTO dto);
 
     /**
      * Convierte UpdateProductDTO a Product para actualizar.
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "priceInfo.originalPrice", source = "originalPrice")
+    @Mapping(target = "priceInfo", source = "originalPrice", qualifiedByName = "toPriceInfo")
     Product toDomain(UpdateProductDTO dto);
 
     /**
@@ -38,6 +42,15 @@ public interface ProductMapper {
     default Category map(String category) {
         if (category == null) return null;
         return Category.valueOf(category.trim().toUpperCase());
+    }
+
+    /**
+     * Convierte BigDecimal a PriceInfo sin descuento.
+     */
+    @Named("toPriceInfo")
+    default PriceInfo toPriceInfo(BigDecimal originalPrice) {
+        if (originalPrice == null) return null;
+        return PriceInfo.withoutDiscount(originalPrice);
     }
 
     /**
