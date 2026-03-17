@@ -1,10 +1,10 @@
 package com.itm.eco_store.infrastructure.adapter.in.web;
 
 import com.itm.eco_store.domain.model.Product;
-import com.itm.eco_store.domain.port.in.CreateProductUseCase;
-import com.itm.eco_store.domain.port.in.DeleteProductUseCase;
-import com.itm.eco_store.domain.port.in.GetProductUseCase;
-import com.itm.eco_store.domain.port.in.UpdateProductUseCase;
+import com.itm.eco_store.application.port.in.CreateProductUseCase;
+import com.itm.eco_store.application.port.in.DeleteProductUseCase;
+import com.itm.eco_store.application.port.in.GetProductUseCase;
+import com.itm.eco_store.application.port.in.UpdateProductUseCase;
 import com.itm.eco_store.infrastructure.adapter.in.web.dto.CreateProductDTO;
 import com.itm.eco_store.infrastructure.adapter.in.web.dto.ProductResponse;
 import com.itm.eco_store.infrastructure.adapter.in.web.dto.UpdateProductDTO;

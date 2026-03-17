@@ -1,39 +1,48 @@
 package com.itm.eco_store.infrastructure.adapter.in.web.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import com.itm.eco_store.domain.model.Category;
 import com.itm.eco_store.domain.model.Product;
 import com.itm.eco_store.infrastructure.adapter.in.web.dto.CreateProductDTO;
 import com.itm.eco_store.infrastructure.adapter.in.web.dto.ProductResponse;
 import com.itm.eco_store.infrastructure.adapter.in.web.dto.UpdateProductDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
+/**
+ * Mapper para convertir entre DTOs y entidades de dominio.
+ * Nota: El descuento NO se aplica aquí, sino en ProductApplicationService.
+ */
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
     /**
-     * Construye el dominio; el descuento se obtiene de la categoría (Category.getDiscountPercent).
+     * Convierte CreateProductDTO a Product para crear.
+     * El precio original se extrae del DTO.
+     * El descuento se aplicará en ProductApplicationService.
      */
-    default Product toDomain(CreateProductDTO dto) {
-        return Product.create(
-                dto.getName(),
-                dto.getDescription(),
-                dto.getCategory(),
-                dto.getOriginalPrice()
-        );
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "priceInfo.originalPrice", source = "originalPrice")
+    Product toDomain(CreateProductDTO dto);
+
+    /**
+     * Convierte UpdateProductDTO a Product para actualizar.
+     */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "priceInfo.originalPrice", source = "originalPrice")
+    Product toDomain(UpdateProductDTO dto);
+
+    /**
+     * Extrae la categoría del DTO como enum.
+     */
+    default Category map(String category) {
+        if (category == null) return null;
+        return Category.valueOf(category.trim().toUpperCase());
     }
 
     /**
-     * Construye el dominio para actualización; el descuento viene de la categoría.
+     * Convierte Product a ProductResponse.
      */
-    default Product toDomain(UpdateProductDTO dto) {
-        return Product.create(
-                dto.getName(),
-                dto.getDescription(),
-                dto.getCategory(),
-                dto.getOriginalPrice()
-        );
-    }
-
     @Mapping(source = "priceInfo.originalPrice", target = "originalPrice")
     @Mapping(source = "priceInfo.discountPercent", target = "discountPercent")
     @Mapping(source = "priceInfo.finalPrice", target = "finalPrice")
