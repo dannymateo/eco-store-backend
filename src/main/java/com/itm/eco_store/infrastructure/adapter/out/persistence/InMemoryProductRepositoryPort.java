@@ -1,7 +1,7 @@
 package com.itm.eco_store.infrastructure.adapter.out.persistence;
 
 import com.itm.eco_store.domain.model.Product;
-import com.itm.eco_store.domain.port.out.ProductRepository;
+import com.itm.eco_store.application.port.out.ProductRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 

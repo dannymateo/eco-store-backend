@@ -1,4 +1,4 @@
-package com.itm.eco_store.domain.port.out;
+package com.itm.eco_store.application.port.out;
 
 import com.itm.eco_store.domain.model.Product;
 
