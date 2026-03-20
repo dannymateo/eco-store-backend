@@ -2,10 +2,12 @@ package com.itm.eco_store.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
 public class Product {
@@ -43,12 +45,6 @@ public class Product {
                 .priceInfo(info)
                 .build();
     }
-
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public String getDescription() { return description; }
-    public Category getCategory() { return category; }
-    public PriceInfo getPriceInfo() { return priceInfo; }
 
     @Override
     public boolean equals(Object o) {

@@ -1,4 +1,4 @@
-package com.itm.eco_store.domain.port.in;
+package com.itm.eco_store.application.port.in;
 
 import com.itm.eco_store.domain.model.Product;
 

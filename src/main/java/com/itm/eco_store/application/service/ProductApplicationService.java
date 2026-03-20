@@ -1,13 +1,16 @@
 package com.itm.eco_store.application.service;
 
 import com.itm.eco_store.application.exception.DuplicateProductNameException;
+import com.itm.eco_store.application.port.out.NotificationPort;
 import com.itm.eco_store.domain.model.Product;
-import com.itm.eco_store.domain.port.in.CreateProductUseCase;
-import com.itm.eco_store.domain.port.in.DeleteProductUseCase;
-import com.itm.eco_store.domain.port.in.GetProductUseCase;
-import com.itm.eco_store.domain.port.in.UpdateProductUseCase;
-import com.itm.eco_store.domain.port.out.ProductRepository;
+import com.itm.eco_store.application.port.in.CreateProductUseCase;
+import com.itm.eco_store.application.port.in.DeleteProductUseCase;
+import com.itm.eco_store.application.port.in.GetProductUseCase;
+import com.itm.eco_store.application.port.in.UpdateProductUseCase;
+import com.itm.eco_store.application.port.out.ProductRepositoryPort;
+import com.itm.eco_store.infrastructure.adapter.in.web.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +22,8 @@ import java.util.Optional;
 public class ProductApplicationService implements
         CreateProductUseCase, GetProductUseCase, UpdateProductUseCase, DeleteProductUseCase {
 
-    private final ProductRepository repository;
+    private final ProductRepositoryPort repository;
+    private final NotificationPort notificationPort;
 
     @Override
     @Transactional
@@ -64,9 +68,20 @@ public class ProductApplicationService implements
     @Override
     @Transactional
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Producto no encontrado: " + id);
+
+        try {
+            Product toDelete = repository.findById(id).orElseThrow();
+
+            if (toDelete == null) {
+                throw new IllegalArgumentException("Producto no encontrado: " + id);
+            }
+
+            repository.deleteById(id);
+
+            notificationPort.send("El producto " + toDelete.getName() + " se ha eliminado");
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        repository.deleteById(id);
     }
 }

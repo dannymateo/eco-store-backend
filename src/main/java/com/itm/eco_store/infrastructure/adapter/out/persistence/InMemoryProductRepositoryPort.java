@@ -1,7 +1,7 @@
 package com.itm.eco_store.infrastructure.adapter.out.persistence;
 
 import com.itm.eco_store.domain.model.Product;
-import com.itm.eco_store.application.port.out.ProductRepository;
+import com.itm.eco_store.application.port.out.ProductRepositoryPort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Component
 @Profile("!prod")
-public class InMemoryProductRepository implements ProductRepository {
+public class InMemoryProductRepositoryPort implements ProductRepositoryPort {
 
     private final ConcurrentHashMap<Long, Product> store = new ConcurrentHashMap<>();
     private final AtomicLong sequence = new AtomicLong(1);
